@@ -52,5 +52,26 @@ class WikiQueryService:
             )
             
         # Answer
-        response = self.gemini.answer_query(request.history, wiki_context)
-        return response
+        response_schema = self.gemini.answer_query(request.history, wiki_context)
+        
+        insight_filed = False
+        if response_schema.is_insightful and response_schema.insight_summary:
+            for cit in response_schema.citations:
+                try:
+                    existing_content = self.wiki_repo.read_page_raw(workspace_id, cit.path)
+                    updated_content = self.gemini.merge_insight_into_page(
+                        existing_content, 
+                        response_schema.insight_summary, 
+                        cit.path
+                    )
+                    self.wiki_repo.write_page_raw(workspace_id, cit.path, updated_content)
+                    insight_filed = True
+                except Exception as e:
+                    logger.warning(f"Failed to merge insight into {cit.path}: {e}")
+                    
+        return ChatResponse(
+            answer=response_schema.answer,
+            citations=response_schema.citations,
+            insufficient_coverage=response_schema.insufficient_coverage,
+            insight_filed=insight_filed
+        )

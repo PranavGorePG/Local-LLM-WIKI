@@ -24,3 +24,13 @@ def get_workspace(workspace_id: str, service: WorkspaceService = Depends(get_wor
         return WorkspaceResponse(workspace_id=workspace_id, name=workspace_id, path=str(path))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Workspace not found")
+
+@router.delete("/{workspace_id}")
+def delete_workspace(workspace_id: str, confirm: bool = False, service: WorkspaceService = Depends(get_workspace_service)):
+    if not confirm:
+        raise HTTPException(status_code=400, detail="Pass confirm=true to delete")
+    try:
+        service.delete_workspace(workspace_id)
+        return {"status": "deleted", "workspace_id": workspace_id}
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Workspace not found")

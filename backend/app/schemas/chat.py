@@ -17,3 +17,4 @@ class ChatResponse(BaseModel):
     answer: str
     citations: List[Citation]
     insufficient_coverage: bool = False
+    insight_filed: bool = False

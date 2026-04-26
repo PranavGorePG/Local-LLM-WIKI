@@ -7,6 +7,7 @@ from app.services.wiki_repository import WikiRepository
 from app.services.wiki_compiler_service import WikiCompilerService
 from app.services.wiki_query_service import WikiQueryService
 from app.services.wiki_lint_service import WikiLintService
+from app.services.wiki_repair_service import WikiRepairService
 
 # Instantiate services once (singleton pattern for stateless services)
 workspace_service = WorkspaceService()
@@ -18,7 +19,8 @@ wiki_compiler_service = WikiCompilerService(
     workspace_service, file_storage_service, document_parser_service, gemini_service, wiki_repository
 )
 wiki_query_service = WikiQueryService(gemini_service, wiki_repository)
-wiki_lint_service = WikiLintService(wiki_repository)
+wiki_lint_service = WikiLintService(wiki_repository, gemini_service)
+wiki_repair_service = WikiRepairService(gemini_service, wiki_repository)
 
 def get_workspace_service() -> WorkspaceService:
     return workspace_service
@@ -37,3 +39,6 @@ def get_wiki_lint_service() -> WikiLintService:
 
 def get_wiki_repository() -> WikiRepository:
     return wiki_repository
+
+def get_wiki_repair_service() -> WikiRepairService:
+    return wiki_repair_service

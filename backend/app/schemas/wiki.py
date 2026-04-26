@@ -30,9 +30,14 @@ class WikiPageResponse(BaseModel):
     content: str
 
 class LintIssue(BaseModel):
-    severity: str  # error, warning
+    severity: str  # error, warning, suggestion
     path: str
     message: str
 
 class LintResult(BaseModel):
     issues: List[LintIssue]
+
+class RepairResult(BaseModel):
+    pages_repaired: int
+    pages_deleted: int
+    summary: str

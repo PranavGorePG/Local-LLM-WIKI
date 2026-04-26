@@ -50,6 +50,8 @@ if prompt := st.chat_input("Ask a question about your wiki..."):
                         st.markdown("**Citations:**")
                         for cit in citations:
                             st.caption(f"- {cit['title']} ({cit['path']})")
+                    if data.get('insight_filed'):
+                        st.caption("💡 Insight filed to wiki.")
                 
                 # Add assistant response to history
                 st.session_state.messages.append({"role": "assistant", "content": answer})

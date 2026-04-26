@@ -73,12 +73,27 @@ with col2:
                 issues = res.json().get("issues", [])
                 if issues:
                     for issue in issues:
-                        icon = "🔴" if issue['severity'] == "error" else "🟡"
+                        if issue['severity'] == "error":
+                            icon = "🔴"
+                        elif issue['severity'] == "suggestion":
+                            icon = "💡"
+                        else:
+                            icon = "🟡"
                         st.write(f"{icon} **{issue['path']}**: {issue['message']}")
                 else:
                     st.success("No lint issues found! Wiki is healthy.")
             else:
                 st.error(f"Lint failed: {res.text}")
+                
+    if st.button("🔧 Repair Wiki"):
+        with st.spinner("Repairing wiki... this may take a moment."):
+            res = requests.post(f"{API_URL}/wiki/repair?workspace_id={workspace_id}")
+            if res.status_code == 200:
+                data = res.json()
+                st.success(data['summary'])
+                st.info(f"Pages repaired: {data['pages_repaired']} | Pages deleted: {data['pages_deleted']}")
+            else:
+                st.error(f"Repair failed: {res.text}")
                 
     st.subheader("Wiki Pages")
     try:

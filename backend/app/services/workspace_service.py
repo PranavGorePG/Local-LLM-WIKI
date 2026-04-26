@@ -72,7 +72,7 @@ class WorkspaceService:
         wiki_dir = workspace_path / WIKI_DIR_NAME
         
         with open(wiki_dir / "index.md", "w", encoding="utf-8") as f:
-            f.write("---\ntitle: Index\ntype: index\n---\n\n# Index\n\nWelcome to the wiki index.\n")
+            f.write("---\ntitle: Index\ntype: index\n---\n\n# Index\n\nWelcome to the wiki index.\n\n<!--\nENFORCED INDEX FORMAT:\n- [[slug]] → category/slug.md\n-->\n")
             
         with open(wiki_dir / "log.md", "w", encoding="utf-8") as f:
             f.write("---\ntitle: Log\ntype: log\n---\n\n# Log\n\nIngest log:\n")
@@ -97,3 +97,8 @@ This workspace relies on a strict file architecture.
 """
         with open(workspace_path / "AGENTS.md", "w", encoding="utf-8") as f:
             f.write(agents_content)
+
+    def delete_workspace(self, workspace_id: str):
+        path = self.resolve_workspace_path(workspace_id)
+        shutil.rmtree(path)
+        logger.info(f"Deleted workspace: {workspace_id}")

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from app.schemas.wiki import IngestRequest, IngestResult, WikiPageResponse, LintResult
+from app.schemas.wiki import IngestRequest, IngestResult, WikiPageResponse, LintResult, RepairResult
 from app.services.wiki_compiler_service import WikiCompilerService
 from app.services.wiki_lint_service import WikiLintService
+from app.services.wiki_repair_service import WikiRepairService
 from app.services.wiki_repository import WikiRepository
-from app.api.deps import get_wiki_compiler_service, get_wiki_lint_service, get_wiki_repository
+from app.api.deps import get_wiki_compiler_service, get_wiki_lint_service, get_wiki_repository, get_wiki_repair_service
 
 router = APIRouter()
 
@@ -49,5 +50,18 @@ def lint_wiki(
 ):
     try:
         return service.lint_wiki(workspace_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/repair", response_model=RepairResult)
+def repair_wiki(
+    workspace_id: str,
+    service: WikiRepairService = Depends(get_wiki_repair_service)
+):
+    try:
+        # Run lint first to get current issues
+        lint_service = get_wiki_lint_service()
+        lint_result = lint_service.lint_wiki(workspace_id)
+        return service.repair_wiki(workspace_id, lint_result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,20 +1,12 @@
 ---
-title: Encoder-Decoder Architecture
-type: Concept
+title: Encoder-decoder architecture
+type: model architecture
 source_documents:
-- NIPS-2017-attention-is-all-you-need-Paper.pdf
-related_pages:
-- Machine Translation
-- Recurrent Neural Networks (RNNs)
-- Self-Attention
-- Transformer Architecture
-- Attention Mechanism
-- Multi-Head Attention
-- Convolutional Neural Networks (CNNs) in Sequence Models
+- self_attention_and_rnns.pdf
+related_pages: []
 tags:
-- Neural Networks
-- Deep Learning
-- Sequence Models
+- sequence to sequence
+- deep learning
 ---
 
-The [[Encoder-Decoder Architecture]] is a common framework in neural sequence transduction models, particularly for tasks like [[Machine Translation]]. It consists of two main parts: an encoder and a decoder. The encoder processes an input sequence of symbol representations (e.g., source language words) and transforms it into a sequence of continuous representations, often referred to as a context vector or hidden states. The decoder then takes this encoded representation and generates an output sequence of symbols (e.g., target language words), typically one element at a time, in an auto-regressive manner.Many early models used [[Recurrent Neural Networks (RNNs)]] or [[Convolutional Neural Networks (CNNs)]] for both the encoder and decoder. The [[Transformer Architecture]], introduced in "[[Attention Is All You Need]]" (Vaswani et al., 2017), also follows this overall structure, but replaces RNNs and CNNs with stacked [[Self-Attention]] and point-wise fully connected layers. The decoder in a Transformer specifically inserts a third [[Multi-Head Attention]] sub-layer that performs attention over the output of the encoder stack, allowing every position in the decoder to attend to all positions in the input sequence.
+An [[Encoder-decoder architecture]] is a framework used in sequence-to-sequence modeling. It consists of two main parts: an encoder that processes the input sequence and compresses it into a fixed-length context vector, and a decoder that generates the output sequence based on this context vector. This architecture was commonly implemented using [[Recurrent Neural Network (RNN|RNN]]s for tasks like [[Machine Translation]] and [[Seq2Seq model|Seq2Seq]] tasks. The [[Transformer architecture]] employs a similar concept but uses [[Self-attention]] mechanisms instead of recurrence.

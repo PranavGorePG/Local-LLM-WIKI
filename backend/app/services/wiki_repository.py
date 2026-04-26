@@ -107,3 +107,81 @@ class WikiRepository:
             if temp_path.exists():
                 temp_path.unlink()
             raise e
+
+    def parse_index(self, workspace_id: str) -> dict:
+        import re
+        try:
+            path = self.get_page_path(workspace_id, "index.md")
+            if not path.exists():
+                return {}
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
+            
+            index_map = {}
+            matches = re.findall(r"-\s+\[\[(.*?)\]\]\s+→\s+(.*?\.md)", content)
+            for name, rel_path in matches:
+                index_map[name] = rel_path
+            return index_map
+        except Exception:
+            return {}
+
+    def read_page_raw(self, workspace_id: str, relative_path: str) -> str:
+        path = self.get_page_path(workspace_id, relative_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Page {relative_path} not found")
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+
+    def write_page_raw(self, workspace_id: str, relative_path: str, full_content: str):
+        path = self.get_page_path(workspace_id, relative_path)
+        # Ensure directory exists just in case
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = path.with_suffix(".md.tmp")
+        try:
+            with open(temp_path, "w", encoding="utf-8") as f:
+                f.write(full_content)
+            temp_path.replace(path)
+        except Exception as e:
+            if temp_path.exists():
+                temp_path.unlink()
+            raise e
+
+    def rebuild_index(self, workspace_id: str):
+        pages = self.list_pages(workspace_id)
+        
+        grouped = {"concepts": [], "entities": [], "topics": [], "sources": []}
+        
+        for path in pages:
+            if path in ["index.md", "log.md", "overview.md"]:
+                continue
+            
+            try:
+                metadata, _ = self.read_page(workspace_id, path)
+            except FileNotFoundError:
+                continue
+            except Exception as e:
+                logger.warning(f"Could not read {path} during rebuild: {e}")
+                continue
+            
+            if not metadata:
+                continue
+                
+            p_type = metadata.get("type", "topic")
+            
+            category = p_type if p_type.endswith('s') else f"{p_type}s"
+            if category not in grouped:
+                category = "topics"
+                
+            slug = path.split("/")[-1].replace(".md", "")
+            grouped[category].append(f"- [[{slug}]] → {path}")
+            
+        body = "# Index\n\nWelcome to the wiki index.\n\n<!--\nENFORCED INDEX FORMAT:\n- [[slug]] → category/slug.md\n-->\n\n"
+        
+        for cat in ["concepts", "entities", "topics", "sources"]:
+            if grouped[cat]:
+                body += f"## {cat.capitalize()}\n"
+                for entry in sorted(grouped[cat]):
+                    body += f"{entry}\n"
+                body += "\n"
+                
+        self.overwrite_index(workspace_id, body)

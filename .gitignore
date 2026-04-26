@@ -1,2 +1,8 @@
 backend/.env
+backend/app/.env
 .venv
+backend/traverse.py
+frontend/traverse.py
+backend/combined_code.txt
+frontend/combined_code.txt
+.env.*

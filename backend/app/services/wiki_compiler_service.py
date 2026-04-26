@@ -7,8 +7,20 @@ from app.services.document_parser_service import DocumentParserService
 from app.services.gemini_service import GeminiService
 from app.services.wiki_repository import WikiRepository
 from app.core.logger import get_logger
+import re
 
 logger = get_logger(__name__)
+
+def _normalize_concept(name: str) -> str:
+    """Normalize a concept name for fuzzy matching."""
+    name = name.lower().strip()
+    # Remove parenthetical abbreviations like (RNN), (NLP)
+    name = re.sub(r'\(.*?\)', '', name)
+    # Remove special characters
+    name = re.sub(r'[^\w\s]', '', name)
+    # Strip trailing 's' for basic plural normalization
+    name = name.strip().rstrip('s')
+    return name.strip()
 
 class WikiCompilerService:
     def __init__(
@@ -56,39 +68,65 @@ class WikiCompilerService:
         except FileNotFoundError:
             agents_md = "No AGENTS.md found."
 
-        try:
-            _, index_md = self.wiki_repo.read_page(workspace_id, "index.md")
-        except FileNotFoundError:
-            index_md = ""
-
-        # Build catalog
-        pages = self.wiki_repo.list_pages(workspace_id)
-        catalog = "\n".join(pages)
-
-        # Call Gemini
-        result = self.gemini.compile_wiki_updates(
-            agents_md=agents_md,
-            current_index=index_md,
-            page_catalog=catalog,
-            documents=parsed_docs
-        )
-
-        # Apply updates
+        # Extract concepts from all documents
+        concepts = self.gemini.extract_concepts(parsed_docs)
+        
+        # Load current index
+        index_map = self.wiki_repo.parse_index(workspace_id)
+        
         pages_created = 0
         pages_updated = 0
-        for update in result.pages:
-            # Check if page exists to increment correct counter
-            # We assume it exists if its path is in catalog roughly, but let's just write
-            # We don't have exact path resolution here but we can guess
-            pages_updated += 1 # Simplify for now
-            self.wiki_repo.write_page(workspace_id, update)
+        
+        # Load existing pages for concepts already in index
+        existing_pages = {}
+        
+        # Build normalized index map for fuzzy matching
+        normalized_index = {
+            _normalize_concept(k): v 
+            for k, v in index_map.items()
+        }
 
-        # Update index and log
-        self.wiki_repo.overwrite_index(workspace_id, result.index_markdown)
-        self.wiki_repo.append_log(workspace_id, result.log_entry)
+        # When checking if concept exists, use normalized form
+        for concept in concepts:
+            name = concept['concept_name']
+            normalized_name = _normalize_concept(name)
+            
+            if normalized_name in normalized_index:
+                # concept exists — load existing page
+                path = normalized_index[normalized_name]
+                try:
+                    existing_pages[name] = self.wiki_repo.read_page_raw(workspace_id, path)
+                except FileNotFoundError:
+                    existing_pages[name] = ""
+            else:
+                # concept is new
+                existing_pages[name] = ""
+
+        # Call 2 — batch compile all pages (1 Gemini call)
+        page_updates = self.gemini.batch_compile_pages(
+            concepts=concepts,
+            existing_pages=existing_pages,
+            documents=parsed_docs,
+            agents_md=agents_md
+        )
+
+        # Write all pages to disk (no Gemini calls, pure file IO)
+        for update in page_updates:
+            self.wiki_repo.write_page(workspace_id, update)
+            if update.slug in [v.split('/')[-1].replace('.md','') for v in index_map.values()]:
+                pages_updated += 1
+            else:
+                pages_created += 1
+
+        # Rebuild index
+        self.wiki_repo.rebuild_index(workspace_id)
+        
+        # Append log
+        log_entry = f"Ingested {len(parsed_docs)} documents, extracted {len(concepts)} concepts. Created {pages_created}, Updated {pages_updated}."
+        self.wiki_repo.append_log(workspace_id, log_entry)
 
         return IngestResult(
             pages_created=pages_created,
             pages_updated=pages_updated,
-            summary=result.summary
+            summary=log_entry
         )
