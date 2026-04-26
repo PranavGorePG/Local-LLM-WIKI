@@ -1,0 +1,208 @@
+{
+  "main": {
+    "id": "87fe59fe74851f51",
+    "type": "split",
+    "children": [
+      {
+        "id": "dd8c2393337614b8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0d5911c31caa7421",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "50dc9593ca557d83",
+    "type": "split",
+    "children": [
+      {
+        "id": "93a7cf4ac9198ab9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "06746c5921005ccf",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "546c303f14d75bb9",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "catlog",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "ac647cfe28d3f16d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "af06b5cc79c84644",
+    "type": "split",
+    "children": [
+      {
+        "id": "9862f14c39a82de9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f23e7a8442accc09",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "de739f487eb524f5",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "b29caee0c9022d25",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "964a4802ed96991b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "b187f061173137fd",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "0d5911c31caa7421",
+  "lastOpenFiles": [
+    "topics/recurrent-neural-networks-rnns.md",
+    "Recurrent Neural Networks (RNNs).md",
+    "Positional Encoding.md",
+    "Attention Window.md",
+    "topics/attention-window.md",
+    "index.md",
+    "Large Language Models (LLMs).md",
+    "topics/overview.md",
+    "topics/bleu-score.md",
+    "topics/convolutional-neural-networks-cnns-in-sequence-models.md",
+    "topics/encoder-decoder-architecture.md",
+    "topics/positional-encoding.md",
+    "topics/scaled-dot-product-attention.md",
+    "topics/multi-head-attention.md",
+    "topics/self-attention.md",
+    "topics/transformer-architecture.md",
+    "topics/attention-mechanism.md",
+    "topics/graph-structured-data.md",
+    "topics/skewed-line-sink.md",
+    "topics/attention-sink.md",
+    "topics/graph-neural-networks-gnns.md",
+    "topics/large-language-models-llms.md",
+    "topics/guan-etal-2025-attention-mechanisms-perspective.md",
+    "topics/nips-2017-attention-is-all-you-need-paper.md",
+    "topics/nips-2017-attention-is-all-you-need-paper.md.tmp"
+  ]
+}

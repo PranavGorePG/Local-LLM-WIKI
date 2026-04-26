@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+streamlit
+google-genai
+PyMuPDF
+python-multipart
+pyyaml
+requests
