@@ -48,3 +48,6 @@ To view your knowledge graph and use backlinks:
 2. Select "Open folder as vault".
 3. Navigate to `llm_wiki_local/workspaces/<your_workspace_id>/wiki` and select it.
 4. Enjoy your generated wiki with full Graph View and `[[wikilink]]` support!
+
+# Local-LLM-WIKI
+LLM WIKI 
