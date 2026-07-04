@@ -4,8 +4,9 @@ from app.schemas.wiki import IngestRequest, IngestResult, WikiPageResponse, Lint
 from app.services.wiki_compiler_service import WikiCompilerService
 from app.services.wiki_lint_service import WikiLintService
 from app.services.wiki_repair_service import WikiRepairService
+from app.services.wiki_integrity_service import IntegrityReport, WikiIntegrityService
 from app.services.wiki_repository import WikiRepository
-from app.api.deps import get_wiki_compiler_service, get_wiki_lint_service, get_wiki_repository, get_wiki_repair_service
+from app.api.deps import get_wiki_compiler_service, get_wiki_lint_service, get_wiki_repository, get_wiki_repair_service, get_wiki_integrity_service
 
 router = APIRouter()
 
@@ -63,5 +64,25 @@ def repair_wiki(
         lint_service = get_wiki_lint_service()
         lint_result = lint_service.lint_wiki(workspace_id)
         return service.repair_wiki(workspace_id, lint_result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/integrity", response_model=IntegrityReport)
+def check_wiki_integrity(
+    workspace_id: str,
+    service: WikiIntegrityService = Depends(get_wiki_integrity_service)
+):
+    try:
+        return service.run_integrity_check(workspace_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/integrity/repair", response_model=IntegrityReport)
+def repair_wiki_integrity(
+    workspace_id: str,
+    service: WikiIntegrityService = Depends(get_wiki_integrity_service)
+):
+    try:
+        return service.run_integrity_check(workspace_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

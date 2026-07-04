@@ -4,13 +4,25 @@ from app.schemas.wiki import LintResult, LintIssue
 from app.services.wiki_repository import WikiRepository
 
 from app.services.gemini_service import GeminiService
+from app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 class WikiLintService:
-    def __init__(self, wiki_repo: WikiRepository, gemini_service: GeminiService):
+    def __init__(self, wiki_repo: WikiRepository, gemini_service: GeminiService, integrity_service):
         self.wiki_repo = wiki_repo
         self.gemini_service = gemini_service
+        self.integrity_service = integrity_service
 
     def lint_wiki(self, workspace_id: str) -> LintResult:
+        # --- Integrity check first ---
+        logger.info("Running integrity check before lint...")
+        try:
+            self.integrity_service.run_integrity_check(workspace_id)
+        except Exception as e:
+            logger.error(f"Integrity check failed during lint: {e}")
+            # Continue with lint regardless
+
         issues = []
         pages = self.wiki_repo.list_pages(workspace_id)
         

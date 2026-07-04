@@ -7,4 +7,4 @@ type: log
 
 Ingest log:
 
-Ingested 1 documents, extracted 63 concepts. Created 63, Updated 0.
+Ingested 1 documents, extracted 84 concepts. Created 65, Updated 0.

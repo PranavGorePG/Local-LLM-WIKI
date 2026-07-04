@@ -1,12 +1,20 @@
 ---
 title: Machine Translation
-type: NLP task
+type: topic
 source_documents:
-- self_attention_and_rnns.pdf
-related_pages: []
+- NIPS-2017-attention-is-all-you-need-Paper.pdf
+related_pages:
+- transformer
+- attention-mechanism
+- bleu-score
+- beam-search
+- wmt-2014-english-german
+- wmt-2014-english-french
 tags:
-- NLP
-- sequence to sequence
+- nlp
+- sequence modeling
+- translation
+updated: '2023-10-27'
 ---
 
-[[Machine Translation]] is the task of automatically converting text from one language to another. Early approaches often used [[Recurrent Neural Network (RNN|RNN]]-based [[Seq2Seq model|Seq2Seq]] architectures with [[Encoder-decoder architecture|encoder-decoder]] structures. Modern machine translation heavily relies on the [[Transformer architecture]] due to its superior performance in handling long sentences and capturing complex linguistic relationships.
+Machine translation is a subfield of computational linguistics that deals with the automatic translation of human language. This involves converting text or speech from one language (the source language) to another language (the target language) using software. Dominant sequence transduction models, such as those based on recurrent or convolutional neural networks, have historically been employed for these tasks. These models typically incorporate an encoder-decoder structure. Recent advancements have seen architectures solely based on attention mechanisms, like the Transformer, achieve state-of-the-art results by dispensing with recurrence and convolutions entirely. These attention-based models often require less training time and can be more parallelizable, leading to significant improvements in translation quality.

@@ -35,8 +35,8 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Raw Documents")
-    if st.button("Refresh Raw Documents"):
-        pass # Streamlit reruns anyway
+    # if st.button("Refresh Raw Documents"):
+    #     pass # Streamlit reruns anyway
         
     try:
         res = requests.get(f"{API_URL}/documents?workspace_id={workspace_id}")
@@ -85,12 +85,85 @@ with col2:
             else:
                 st.error(f"Lint failed: {res.text}")
                 
+    if st.button("🔍 Check Integrity"):
+        with st.spinner("Running integrity check..."):
+            res = requests.get(
+                f"{API_URL}/wiki/integrity?workspace_id={workspace_id}"
+            )
+            if res.status_code == 200:
+                report = res.json()
+                
+                # Summary line
+                recovered = len(report.get("recovered_pages", []))
+                stubs = len(report.get("stub_pages_created", []))
+                folders = report.get("missing_folders_recreated", [])
+                orphans = report.get("orphan_files", [])
+                ghosts = report.get("ghost_entries", [])
+
+                if not any([recovered, stubs, folders, orphans, ghosts,
+                            report.get("index_rebuilt")]):
+                    st.success("✅ Wiki structure is healthy. No issues found.")
+                else:
+                    if report.get("index_rebuilt"):
+                        st.warning("🔁 index.md was missing and has been rebuilt.")
+                    if folders:
+                        st.warning(f"📁 Recreated missing folders: {', '.join(folders)}")
+                    if ghosts:
+                        st.error(f"👻 {len(ghosts)} ghost entries found in index.")
+                    if recovered:
+                        st.success(f"♻️ {recovered} pages recovered from raw documents.")
+                    if stubs:
+                        st.warning(f"⚠️ {stubs} stub pages created (raw sources missing).")
+                    if orphans:
+                        st.info(f"🔗 {len(orphans)} orphan files re-added to index.")
+                    if report.get("unrecoverable"):
+                        st.error(
+                            f"❌ {len(report['unrecoverable'])} pages could not be "
+                            f"recovered: {report['unrecoverable']}"
+                        )
+
+                    # Expandable detail section
+                    with st.expander("📋 Full Integrity Report"):
+                        if ghosts:
+                            st.markdown("**👻 Ghost entries (in index, missing on disk):**")
+                            for g in ghosts:
+                                sources = g.get("source_documents", [])
+                                src_str = ", ".join(sources) if sources else "unknown"
+                                st.caption(
+                                    f"- `{g['expected_path']}` "
+                                    f"(sources: {src_str})"
+                                )
+                        if orphans:
+                            st.markdown("**🔗 Orphan files (on disk, not in index):**")
+                            for o in orphans:
+                                st.caption(f"- `{o}`")
+                        if report.get("unrecoverable"):
+                            st.markdown("**❌ Unrecoverable:**")
+                            for u in report["unrecoverable"]:
+                                st.caption(f"- `{u}`")
+            else:
+                st.error(f"Integrity check failed: {res.text}")
+
     if st.button("🔧 Repair Wiki"):
         with st.spinner("Repairing wiki... this may take a moment."):
             res = requests.post(f"{API_URL}/wiki/repair?workspace_id={workspace_id}")
             if res.status_code == 200:
                 data = res.json()
                 st.success(data['summary'])
+                integrity = data.get("integrity")
+                if integrity:
+                    recovered = len(integrity.get("recovered_pages", []))
+                    stubs = len(integrity.get("stub_pages_created", []))
+                    if recovered or stubs:
+                        with st.expander("🔍 Integrity check ran before repair"):
+                            if recovered:
+                                st.success(f"♻️ {recovered} missing pages were recovered.")
+                            if stubs:
+                                st.warning(
+                                    f"⚠️ {stubs} stub pages created — "
+                                    f"raw sources unavailable: "
+                                    f"{integrity.get('stub_pages_created', [])}"
+                                )
                 st.info(f"Pages repaired: {data['pages_repaired']} | Pages deleted: {data['pages_deleted']}")
             else:
                 st.error(f"Repair failed: {res.text}")

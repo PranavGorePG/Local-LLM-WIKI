@@ -8,6 +8,7 @@ from app.services.wiki_compiler_service import WikiCompilerService
 from app.services.wiki_query_service import WikiQueryService
 from app.services.wiki_lint_service import WikiLintService
 from app.services.wiki_repair_service import WikiRepairService
+from app.services.wiki_integrity_service import WikiIntegrityService, IntegrityReport
 
 # Instantiate services once (singleton pattern for stateless services)
 workspace_service = WorkspaceService()
@@ -19,8 +20,26 @@ wiki_compiler_service = WikiCompilerService(
     workspace_service, file_storage_service, document_parser_service, gemini_service, wiki_repository
 )
 wiki_query_service = WikiQueryService(gemini_service, wiki_repository)
-wiki_lint_service = WikiLintService(wiki_repository, gemini_service)
-wiki_repair_service = WikiRepairService(gemini_service, wiki_repository)
+
+wiki_integrity_service = WikiIntegrityService(
+    wiki_repo=wiki_repository,
+    gemini=gemini_service,
+    file_storage=file_storage_service,
+    parser=document_parser_service,
+    workspace_service=workspace_service,
+)
+
+wiki_lint_service = WikiLintService(
+    wiki_repo=wiki_repository,
+    gemini_service=gemini_service,
+    integrity_service=wiki_integrity_service,
+)
+
+wiki_repair_service = WikiRepairService(
+    gemini=gemini_service,
+    wiki_repo=wiki_repository,
+    integrity_service=wiki_integrity_service,
+)
 
 def get_workspace_service() -> WorkspaceService:
     return workspace_service
@@ -42,3 +61,6 @@ def get_wiki_repository() -> WikiRepository:
 
 def get_wiki_repair_service() -> WikiRepairService:
     return wiki_repair_service
+
+def get_wiki_integrity_service() -> WikiIntegrityService:
+    return wiki_integrity_service
